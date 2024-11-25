@@ -16,6 +16,7 @@ const MAX_SIZE_FOR_SLIDERS = 500
 const MAX_SIZE = 4000
 
 signal size_changed(new_size)
+signal opacity_changed(new_opacity)
 signal shapes_changed
 signal shape_index_changed
 
@@ -50,7 +51,9 @@ func get_size() -> int:
 
 
 func set_opacity(opacity: float):
-	_opacity = clampf(opacity, 0.0, 1.0)
+	if opacity != _opacity:
+		_opacity = clampf(opacity, 0.0, 1.0)
+		opacity_changed.emit(_opacity)
 
 
 func get_opacity() -> float:
@@ -213,5 +216,3 @@ func configure_paint_input(painters: Array[HT_Painter], position: Vector2, press
 func on_paint_end():
 	_prev_position = Vector2(-999, -999)
 	_prev_time_ms = 0
-
-

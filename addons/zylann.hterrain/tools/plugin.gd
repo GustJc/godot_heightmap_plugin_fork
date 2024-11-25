@@ -86,6 +86,10 @@ var _mouse_pressed := false
 #var _pending_paint_action = null
 var _pending_paint_commit := false
 
+var _editor_viewports = null
+var _overlay_selector = null
+var _widget_action_name = ""
+
 var _logger := HT_Logger.get_for(self)
 
 
@@ -282,6 +286,9 @@ func _enter_tree():
 
 	_texture_set_editor.import_selected.connect(_on_TextureSetEditor_import_selected)
 	
+	var editor_viewports_container = _get_editor_viewports_container()
+	_editor_viewports = editor_viewports_container.find_children("*","Control", false,false)
+
 
 func _exit_tree():
 	_logger.debug("HTerrain plugin Exit tree")
@@ -455,6 +462,20 @@ func _forward_3d_gui_input(p_camera: Camera3D, p_event: InputEvent) -> int:
 
 	var captured_event = false
 	
+	if p_event is InputEventKey:
+		if p_event.keycode == KEY_G and p_event.is_echo() == false and p_event.pressed:
+			captured_event = true
+			_show_brush_size_selector(2, 300, Color.LIGHT_GREEN, _terrain_painter.get_brush_size(), "brush_size_action",
+			func on_value_changed(value):
+				_terrain_painter.set_brush_size(value)\
+			 )
+		elif p_event.keycode == KEY_H and p_event.is_echo() == false and p_event.pressed:
+			captured_event = true
+			_show_brush_size_selector(0, 100, Color.LIGHT_GREEN, _terrain_painter.get_opacity()*100, "brush_opacity_action",
+			func on_value_changed(value):
+				_terrain_painter.set_opacity(value/100.0)\
+			 )
+
 	if p_event is InputEventMouseButton:
 		var mb = p_event
 		
@@ -850,6 +871,60 @@ func _debug_spawn_collider_indicators():
 			else:
 				mi.show()
 				mi.position = hit.position
+
+
+
+func _show_brush_size_selector(min_size, max_size, widget_color, initial_value, action_name, on_value_selected):
+	if _widget_action_name != action_name:
+		var active_viewport = _get_active_viewport()
+
+		if active_viewport == null:
+			# when mouse outside 3d viewport area, dont try to show widget
+			return
+
+		_widget_action_name = action_name
+		if active_viewport != null:
+			var selector_scene = ResourceLoader.load("res://addons/zylann.hterrain/tools/brush/brush_size_selector.tscn")
+			var selector = selector_scene.instantiate()
+
+			selector.min_value = min_size
+			selector.max_value = max_size
+			selector.brush_preview_color = widget_color
+
+			_overlay_selector = selector
+			_overlay_selector.position = active_viewport.get_global_mouse_position()
+			_overlay_selector.set_meta("action", action_name)
+
+			EditorInterface.get_base_control().add_child(_overlay_selector)
+			selector.set_initial_value(initial_value)
+
+			selector.on_value_selected.connect(func f(value):
+				on_value_selected.call(value)
+				_remove_overlay_selector()
+			)
+			selector.on_cancel.connect(func f():
+				_remove_overlay_selector()
+			)
+
+
+func _remove_overlay_selector():
+	if _overlay_selector != null:
+		_overlay_selector.queue_free()
+		_overlay_selector = null
+		_widget_action_name = ""
+
+
+func _get_active_viewport():
+	for viewport in _editor_viewports:
+		if viewport.get_rect().has_point(viewport.get_local_mouse_position()):
+			return viewport
+
+	return null
+
+
+func _get_editor_viewports_container():
+	# Returns the Node3DEditorViewportContainer
+	return EditorInterface.get_editor_viewport_3d().get_parent().get_parent()
 
 
 func _spawn_vertical_bound_boxes():

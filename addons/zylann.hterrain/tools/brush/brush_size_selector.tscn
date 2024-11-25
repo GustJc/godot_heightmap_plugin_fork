@@ -1,0 +1,61 @@
+[gd_scene load_steps=5 format=3 uid="uid://d324kwgdf7e6l"]
+
+[ext_resource type="Script" path="res://addons/zylann.hterrain/tools/brush/brush_size_selector.gd" id="1_r2t4n"]
+[ext_resource type="Texture2D" uid="uid://dthlbsmf51jk3" path="res://addons/zylann.hterrain/tools/brush/ui_images/brush_circle.png" id="2_hu4m7"]
+[ext_resource type="Texture2D" uid="uid://b8nf7x6l56anw" path="res://addons/zylann.hterrain/tools/brush/ui_images/brush_circle_background.png" id="2_mj44p"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_0d2ij"]
+font_size = 32
+
+[node name="BrushSizeSelector" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_r2t4n")
+brush_preview_color = Color(1, 0, 0, 1)
+
+[node name="BrushSizeBackground" type="TextureRect" parent="."]
+unique_name_in_owner = true
+modulate = Color(0.478431, 0.478431, 0.478431, 0.423529)
+layout_mode = 0
+offset_left = -162.0
+offset_top = -162.0
+offset_right = 163.0
+offset_bottom = 163.0
+texture = ExtResource("2_mj44p")
+expand_mode = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="BrushSizePreview" type="TextureRect" parent="."]
+unique_name_in_owner = true
+modulate = Color(1, 0, 0, 1)
+layout_mode = 1
+offset_left = -157.0
+offset_top = -157.0
+offset_right = 158.0
+offset_bottom = 158.0
+texture = ExtResource("2_hu4m7")
+expand_mode = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="ValueLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.001
+anchor_bottom = 0.001
+offset_left = -36.0
+offset_top = -22.648
+offset_right = 37.0
+offset_bottom = 22.352
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.7, 0.7)
+pivot_offset = Vector2(36, 22)
+text = "105"
+label_settings = SubResource("LabelSettings_0d2ij")
+horizontal_alignment = 1
+vertical_alignment = 1
